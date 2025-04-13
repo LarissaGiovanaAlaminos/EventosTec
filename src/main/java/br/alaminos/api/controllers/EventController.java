@@ -1,4 +1,4 @@
-package br.alaminos.api.controller;
+package br.alaminos.api.controllers;
 
 import br.alaminos.api.domain.event.Event;
 import br.alaminos.api.domain.event.dto.EventRequestDTO;

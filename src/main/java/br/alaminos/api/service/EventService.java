@@ -68,4 +68,9 @@ public class EventService {
         fos.close();
         return convFile;
     }
+
+    public Event getEvent(UUID id){
+        return repository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("Event not found"));
+    }
 }
