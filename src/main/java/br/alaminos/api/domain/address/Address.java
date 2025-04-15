@@ -9,7 +9,7 @@ import lombok.Setter;
 
 import java.util.UUID;
 
-@Table(name = "Address")
+@Table(name = "address")
 @Entity
 @Getter
 @Setter
@@ -20,9 +20,10 @@ public class Address {
     @Id
     @GeneratedValue
     private UUID id;
-    private String cidade;
+    private String city;
     private String uf;
-    @ManyToOne
+
+    @OneToOne
     @JoinColumn(name = "event_id")
     private Event event;
 }
