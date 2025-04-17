@@ -1,6 +1,7 @@
 package br.alaminos.api.controllers;
 
 import br.alaminos.api.domain.event.Event;
+import br.alaminos.api.domain.event.dto.EventDetailsDTO;
 import br.alaminos.api.domain.event.dto.EventRequestDTO;
 import br.alaminos.api.domain.event.dto.EventResponseDTO;
 import br.alaminos.api.service.EventService;
@@ -12,6 +13,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.util.Date;
 import java.util.List;
+import java.util.UUID;
 
 @RestController
 @RequestMapping("/api/event")
@@ -54,5 +56,12 @@ public class EventController {
         List<EventResponseDTO> events = service.getFilteredEvents(page, size, title, city, uf, startDate, endDate);
 
         return ResponseEntity.ok(events);
+    }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<EventDetailsDTO> getEventDetails(
+            @PathVariable("id") UUID id
+    ) {
+        return ResponseEntity.ok(service.getEventDetails(id));
     }
 }

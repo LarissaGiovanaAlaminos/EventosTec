@@ -1,6 +1,8 @@
 package br.alaminos.api.service;
 
+import br.alaminos.api.domain.coupon.Coupon;
 import br.alaminos.api.domain.event.Event;
+import br.alaminos.api.domain.event.dto.EventDetailsDTO;
 import br.alaminos.api.domain.event.dto.EventRequestDTO;
 import br.alaminos.api.domain.event.dto.EventResponseDTO;
 import br.alaminos.api.repositories.EventRepository;
@@ -17,11 +19,7 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.time.Year;
-import java.util.Calendar;
-import java.util.List;
-import java.util.Objects;
-import java.util.UUID;
-import java.util.Date;
+import java.util.*;
 
 @Service
 public class EventService {
@@ -37,6 +35,9 @@ public class EventService {
 
     @Autowired
     private AddressService addressService;
+
+    @Autowired
+    private CouponService couponService;
 
     public Event createEvent(EventRequestDTO dto) {
         String imgUrl = null;
@@ -111,11 +112,11 @@ public class EventService {
         Calendar cal = Calendar.getInstance();
         cal.set(Year.now().getValue() + 70, Calendar.JANUARY, 1);
 
-        title = (title != null)? title:"";
-        city = (city != null)? city:"";
-        uf = (uf != null)? uf:"";
-        startDate = (startDate != null)? startDate: new Date();
-        endDate = (endDate != null)? endDate :cal.getTime();
+        title = (title != null) ? title : "";
+        city = (city != null) ? city : "";
+        uf = (uf != null) ? uf : "";
+        startDate = (startDate != null) ? startDate : new Date();
+        endDate = (endDate != null) ? endDate : cal.getTime();
 
         Pageable pageable = PageRequest.of(page, size);
 
@@ -132,5 +133,32 @@ public class EventService {
                         event.getImgUrl()
                 )
         ).stream().toList();
+    }
+
+    public EventDetailsDTO getEventDetails(UUID id) {
+        Event event = repository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("Event not found"));
+
+        List <Coupon> coupons = couponService.consultCoupon(id, new Date());
+
+        List<EventDetailsDTO.CouponDTO> couponDTOS = coupons.stream()
+                .map(coupon -> new EventDetailsDTO.CouponDTO(
+                        coupon.getCode(),
+                        coupon.getDiscount(),
+                        coupon.getValid()))
+                .toList();
+
+        return new EventDetailsDTO(
+                event.getId(),
+                event.getTitle(),
+                event.getDescription(),
+                event.getDate(),
+                event.getAddress() != null ? event.getAddress().getCity() : "",
+                event.getAddress() != null ? event.getAddress().getUf() : "",
+                event.getRemote(),
+                event.getEventUrl(),
+                event.getImgUrl(),
+                couponDTOS
+        );
     }
 }
